@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from mlops.data.generate import generate
 from sklearn.ensemble import HistGradientBoostingRegressor
 from starlette.testclient import TestClient
 
-from mlops.data.generate import generate
 from mlops.features.build import FEATURE_COLS, build_features, clean_features
 from mlops.serving import api
 
