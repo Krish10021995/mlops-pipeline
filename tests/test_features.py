@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import pandas as pd
-from mlops.data.generate import generate
 
+from mlops.data.generate import generate
 from mlops.features.build import FEATURE_COLS, build_features, clean_features
 
 

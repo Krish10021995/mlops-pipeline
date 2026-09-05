@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import joblib
-from mlops.data.generate import generate
 
+from mlops.data.generate import generate
 from mlops.features.build import FEATURE_COLS, build_features, clean_features
 from mlops.models.train import split_by_time, train_pipeline
 
