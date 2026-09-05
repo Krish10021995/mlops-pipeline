@@ -26,8 +26,8 @@ def split_by_time(
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     df = df.sort_values("pickup_datetime").reset_index(drop=True)
     n = len(df)
-    n_test = int(round(n * test_fraction))
-    n_val = int(round(n * val_fraction))
+    n_test = round(n * test_fraction)
+    n_val = round(n * val_fraction)
     test = df.iloc[n - n_test :]
     val = df.iloc[n - n_test - n_val : n - n_test]
     train = df.iloc[: n - n_test - n_val]
@@ -69,9 +69,9 @@ def train_pipeline(
             "val_rmse": float(np.sqrt(mean_squared_error(yv, val_pred))),
             "val_mae": float(mean_absolute_error(yv, val_pred)),
             "val_r2": float(r2_score(yv, val_pred)),
-            "train_rows": int(len(train)),
-            "val_rows": int(len(val)),
-            "test_rows": int(len(test)),
+            "train_rows": len(train),
+            "val_rows": len(val),
+            "test_rows": len(test),
         }
         mlflow.log_metrics({k: v for k, v in metrics.items() if isinstance(v, (int, float))})
         model_info = mlflow.sklearn.log_model(model, name="model")

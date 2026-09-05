@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> None:
         "psi": score,
         "threshold": args.threshold,
         "drift_detected": score > args.threshold,
-        "samples": int(len(live)),
+        "samples": len(live),
     }
     ensure_dir(args.output)
     with open(args.output, "w", encoding="utf-8") as fh:

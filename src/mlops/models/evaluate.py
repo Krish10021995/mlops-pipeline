@@ -31,7 +31,7 @@ def evaluate_model(payload: dict, df: pd.DataFrame) -> dict:
     baseline_rmse = float(np.sqrt(mean_squared_error(y_test, baseline_pred)))
 
     return {
-        "test_rows": int(len(test)),
+        "test_rows": len(test),
         "test_rmse": rmse,
         "test_mae": mae,
         "test_r2": r2,

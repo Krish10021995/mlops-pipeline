@@ -4,13 +4,19 @@ import argparse
 import csv
 import os
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException
-from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    Counter,
+    Gauge,
+    Histogram,
+    generate_latest,
+)
 from pydantic import BaseModel, Field
 from starlette.responses import Response
 
@@ -110,7 +116,7 @@ def _append_live_log(value: float) -> None:
         writer = csv.writer(fh)
         if is_new:
             writer.writerow(["created_at", "prediction"])
-        writer.writerow([datetime.utcnow().isoformat(), round(value, 2)])
+        writer.writerow([datetime.now(UTC).isoformat(), round(value, 2)])
 
 
 def main(argv: list[str] | None = None) -> None:
