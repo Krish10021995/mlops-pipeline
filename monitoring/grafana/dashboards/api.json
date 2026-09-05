@@ -1,0 +1,72 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "fillOpacity": 10 } },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "expr": "sum(rate(predict_requests_total[5m]))", "legendFormat": "QPS", "refId": "A" }
+      ],
+      "title": "Requests per second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(predict_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50",
+          "refId": "A"
+        }
+      ],
+      "title": "Prediction latency p50",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "$", "custom": { "fillOpacity": 25 } },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto" },
+      "targets": [
+        { "expr": "prediction_last_value", "legendFormat": "last fare", "refId": "A" }
+      ],
+      "title": "Last prediction (USD)",
+      "type": "stat"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["mlops", "api"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Taxi Fare API",
+  "uid": "taxi-fare-api",
+  "version": 1
+}

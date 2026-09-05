@@ -1,0 +1,48 @@
+name: CD (AWS ECS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        id: image
+        run: |
+          IMAGE="${{ vars.ECR_REPOSITORY }}:${GITHUB_SHA::7}"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Render and deploy task definition
+        run: |
+          TASK_DEF=$(sed -e "s|\$\${IMAGE}|${{ steps.image.outputs.image }}|" deploy/ecs-task-definition.json)
+          aws ecs register-task-definition --cli-input-json "$TASK_DEF"
+          aws ecs update-service \
+            --cluster "${{ vars.ECS_CLUSTER }}" \
+            --service "${{ vars.ECS_SERVICE }}" \
+            --force-new-deployment

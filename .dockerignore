@@ -1,0 +1,11 @@
+__pycache__/
+.venv/
+.git/
+data/
+artifacts/
+mlruns/
+tests/
+monitoring/
+.dvc/
+.pytest_cache/
+.env

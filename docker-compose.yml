@@ -1,0 +1,38 @@
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.8.1
+    command: server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////data/mlflow.db --default-artifact-root /data/mlruns
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data/mlflow:/data
+
+  api:
+    build: .
+    depends_on:
+      - mlflow
+    environment:
+      MODEL_PATH: /app/artifacts/taxi-fare-model.joblib
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    volumes:
+      - ./artifacts:/app/artifacts
+    ports:
+      - "8000:8000"
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"

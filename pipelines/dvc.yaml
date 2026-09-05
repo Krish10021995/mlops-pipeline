@@ -1,0 +1,30 @@
+vars:
+  - pipelines/params.yaml
+
+stages:
+  generate:
+    cmd: mlops-data --rows ${data.n_rows} --seed ${data.seed}
+    params:
+      - data.n_rows
+      - data.seed
+    outs:
+      - data/raw/trips.parquet
+  features:
+    cmd: mlops-features
+    deps:
+      - data/raw/trips.parquet
+    outs:
+      - data/features/features.parquet
+  train:
+    cmd: mlops-train
+    deps:
+      - data/features/features.parquet
+    outs:
+      - artifacts/taxi-fare-model.joblib
+  evaluate:
+    cmd: mlops-evaluate
+    deps:
+      - artifacts/taxi-fare-model.joblib
+      - data/features/features.parquet
+    outs:
+      - artifacts/eval_metrics.json

@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check src tests
+      - name: Unit tests
+        run: pytest --cov=mlops --cov-report=term-missing
+      - name: E2E smoke data to evaluate
+        run: |
+          mlops-data --rows 4000 --seed 42
+          mlops-features
+          mlops-train --max-iter 60
+          mlops-evaluate
+      - name: Verify artifact loads
+        run: python -c "import joblib; m = joblib.load('artifacts/taxi-fare-model.joblib')['model']; print('model ok:', type(m).__name__)"
